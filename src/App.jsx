@@ -239,6 +239,17 @@ const toneMap = {
   },
 };
 
+const baseAssetUrl = import.meta.env.BASE_URL || '/';
+
+function resolvePublicPath(path) {
+  if (!path) {
+    return baseAssetUrl;
+  }
+  const normalizedBase = baseAssetUrl.endsWith('/') ? baseAssetUrl : `${baseAssetUrl}/`;
+  const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
+  return `${normalizedBase}${normalizedPath}`;
+}
+
 function ReferenceList({ title, documents }) {
   if (!documents.length) {
     return null;
@@ -252,7 +263,7 @@ function ReferenceList({ title, documents }) {
           <a
             key={document.id}
             className="reference-chip"
-            href={document.relativePdfPath}
+            href={resolvePublicPath(document.relativePdfPath)}
             target="_blank"
             rel="noreferrer"
           >
@@ -294,7 +305,7 @@ function KnowledgeBasePanel({ documents, loading, query, onQueryChange }) {
             <a
               key={document.id}
               className="kb-doc-card"
-              href={document.relativePdfPath}
+              href={resolvePublicPath(document.relativePdfPath)}
               target="_blank"
               rel="noreferrer"
             >
@@ -361,7 +372,7 @@ function App() {
 
     async function loadKnowledgeBase() {
       try {
-        const response = await fetch('/knowledge-base/standards-kb.json');
+        const response = await fetch(resolvePublicPath('/knowledge-base/standards-kb.json'));
         const payload = await response.json();
         if (!cancelled) {
           setKnowledgeBase(payload.documents ?? []);
